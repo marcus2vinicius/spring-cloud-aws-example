@@ -36,7 +36,16 @@ public class S3Wrapper {
 	}
 
 	private PutObjectResult upload(InputStream inputStream, String uploadKey) {
-		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, uploadKey, inputStream, new ObjectMetadata());
+
+		//Using metadatas and folders
+		ObjectMetadata metadata = new ObjectMetadata();
+		metadata.addUserMetadata("name","filename");
+		metadata.addUserMetadata("category","medical");
+		String folder = "foldername/";
+
+		String path = folder+uploadKey;
+
+		PutObjectRequest putObjectRequest = new PutObjectRequest(bucket, path, inputStream, metadata);
 
 		putObjectRequest.setCannedAcl(CannedAccessControlList.PublicRead);
 
@@ -65,6 +74,9 @@ public class S3Wrapper {
 
 	public ResponseEntity<byte[]> download(String key) throws IOException {
 		GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+
+		//Url Public
+		String url = amazonS3Client.getResourceUrl(getObjectRequest.getBucketName(), getObjectRequest.getKey());
 
 		S3Object s3Object = amazonS3Client.getObject(getObjectRequest);
 
